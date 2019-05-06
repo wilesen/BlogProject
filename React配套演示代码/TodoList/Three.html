@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>02</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+        function mountComponent(component, root){
+            (component.$container = root).appendChild(component._render());
+        }
+        class Component{
+            constructor(props={}){
+                this.props=props;
+            }
+            setState(nextState){
+                this.state={...this.state,...nextState};
+                this._render();
+            }
+            _createDOM(html){
+                const fragment = document.createElement('div');
+                fragment.innerHTML = html;
+                return this._bindEvent(fragment.firstElementChild);          
+            }
+            _bindEvent(el){
+                el.getAttributeNames().forEach(name => {
+                    const matches = name.match(/^on([a-z]+)$/);
+                    matches && el.addEventListener(matches[1], new Function('return ' + el.getAttribute(name)).bind(this)(), false);
+                });
+                Array.from(el.children).forEach( el => this._bindEvent(el));
+                return el;
+            }
+            _render(){
+                const oldElement = this.$element;
+                if (oldElement) {
+                    if(this.shouldComponentUpdate&&!this.shouldComponentUpdate.bind(this)()){
+                        return ;
+                    }
+                    this.componentWillUpdate&&this.componentWillUpdate.bind(this)();
+                    this.$element = this._createDOM(this.render());
+                    this.$container.replaceChild(this.$element, oldElement);
+                    this.componentDidUpdate && this.componentDidUpdate.bind(this)();
+                } else {
+                    this.componentWillMount && this.componentWillMount.bind(this)();
+                    this.$element = this._createDOM(this.render());
+                    this.$container.appendChild(this.$element);
+                    this.componentDidMount && this.componentDidMount.bind(this)();
+                }
+                return this.$element;
+            }
+            
+        }
+        class  Counter extends Component{
+            constructor(props){
+                super(props);
+                this.state={
+                    dateList:[]
+                }
+                this.add=this.add.bind(this);
+                this.reduce=this.reduce.bind(this);
+            }
+            componentWillMount(){
+                console.log('componentWillMount', this.state);
+            }
+            componentDidMount(){
+                console.log('componentDidMount', this.state);
+            }
+            componentDidUpdate(){
+                console.log('componentDidUpdate', this.state);
+            }
+            shouldComponentUpdate(){
+                return true;
+            }
+            componentWillUpdate(){
+                console.log('componentWillUpdate', this.state); 
+            }
+            add(){
+                let newDateList=[...this.state.dateList]
+                newDateList.push(new Date().toString());
+                this.setState({dateList:newDateList});
+            }
+            reduce(){
+                let newDateList=[...this.state.dateList]
+                newDateList.pop();
+                this.setState({dateList:newDateList});
+            }
+            render(){
+                const {dateList}=this.state;
+                const oldElement=this.$element;
+                let color='blue';
+                if (dateList.length >= 5) color = 'red';
+                if (dateList.length <= 0) color = 'green';
+                console.log('render')
+               return (
+                `
+                    <div>  
+                        <div style="color:${color}">当前List条数为 ${dateList.length}</div>
+                        <button onClick="this.add">增加一条</button>
+                        <button onClick="this.reduce">减少一条</button>
+                        <ul>
+                            ${
+                                dateList.map((item,index)=>`<li style="color:${color}">便签${index+1} 时间是：${item}</li>`)
+                            }
+                        </ul>
+                    </div>
+                `
+               )
+            }
+        }
+        mountComponent(new Counter(),document.getElementById('root'));
+        
+    </script>
+</body>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>02</title>
+</head>
+
+<body>
+    <div id="root">
+        <button id='add'>增加一条</button>
+        <button id='reduce'>减少一条</button>
+        <ul id='list' ></ul>
+    </div>
+    <script>
+        const UL=document.getElementById('list');
+        const add= document.getElementById('add');
+        const reduce= document.getElementById('reduce');
+        let num=0;
+        let Arr=[];
+        add.addEventListener('click',()=>{
+            let OL=document.createElement("ol");
+            let TEXT=document.createTextNode(`这里是我第${num+1}条需要做的`);
+            OL.appendChild(TEXT);
+            UL.appendChild(OL)
+            num++;     
+        })
+        reduce.addEventListener('click',()=>{    
+            if(UL.children.length){
+                UL.removeChild(UL.children[UL.children.length-1]);
+                num--;
+            }
+        })
+    </script>
+</body>

@@ -15,6 +15,10 @@ export default ()=>(
 )
 
 
+const traverseContextPool = [];
+const POOL_SIZE = 10;
+const SEPARATOR = '.';
+const SUBSEPARATOR = ':';
 
 /**
  * Maps children that are typically specified as `props.children`.
@@ -22,16 +26,11 @@ export default ()=>(
  * See https://reactjs.org/docs/react-api.html#reactchildrenmap
  *
  *
- * @param {?*} children 传递进来的propsChildren.
+ * @param {?*} children 传递进来的props.children.
  * @param {function(*, int)} func 为传递进来的遍历函数.
- * @param {*} context map函数执行的上下文.
+ * @param {*} context Rmap函数执行的上下文.
  * @return {object} 函数执行返回的结果
  */
-
-const traverseContextPool = [];
-const POOL_SIZE = 10;
-const SEPARATOR = '.';
-const SUBSEPARATOR = ':';
 
 // map函数
 function mapChildren(children, func, context) {
@@ -243,8 +242,12 @@ function getPooledTraverseContext(
 
 
 export {
-    mapChildren as map
-}
+    // forEachChildren as forEach,
+    mapChildren as map,
+    // countChildren as count,
+    // onlyChild as only,
+    // toArray,
+  };
 
 
 
